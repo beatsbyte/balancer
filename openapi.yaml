@@ -1,0 +1,31 @@
+openapi: "3.0.2"
+info:
+    title: Load Balancer API
+    version: "1.0"
+servers:
+    - url: http://localhost:8080/
+components:
+    schemas:
+        error:
+            type: object
+            properties:
+                detail:
+                    description: error message
+                    type: string
+                    required: true
+paths:
+  /v1/compress:
+    post:
+      description: Compressing music
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
