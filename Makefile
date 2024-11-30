@@ -35,7 +35,6 @@ build-debug build-release: build-%: build_%/CMakeCache.txt
 .PHONY: test-debug test-release
 test-debug test-release: test-%: build-%
 	cmake --build build_$* -j $(NPROCS) --target balancer_unittest
-	cmake --build build_$* -j $(NPROCS) --target balancer_benchmark
 	cd build_$* && ((test -t 1 && GTEST_COLOR=1 PYTEST_ADDOPTS="--color=yes" ctest -V) || ctest -V)
 	pycodestyle tests
 
@@ -72,12 +71,8 @@ format:
 	find src -name '*pp' -type f | xargs $(CLANG_FORMAT) -i
 	find tests -name '*.py' -type f | xargs autopep8 -i
 
-# Set environment for --in-docker-start
-export DB_CONNECTION := postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@service-postgres:5432/${POSTGRES_DB}
-
 # Internal hidden targets that are used only in docker environment
 --in-docker-start-debug --in-docker-start-release: --in-docker-start-%: install-%
-	psql ${DB_CONNECTION} -f ./postgresql/data/initial_data.sql
 	/home/user/.local/bin/balancer \
 		--config /home/user/.local/etc/balancer/static_config.yaml \
 		--config_vars /home/user/.local/etc/balancer/config_vars.docker.yaml
