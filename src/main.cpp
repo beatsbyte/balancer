@@ -7,7 +7,6 @@
 #include <userver/utils/daemon_run.hpp>
 
 #include "handlers/v1/compress/view.hpp"
-#include "handlers/v1/imalive/view.hpp"
 
 int main(int argc, char* argv[]) {
   auto component_list = userver::components::MinimalServerComponentList()

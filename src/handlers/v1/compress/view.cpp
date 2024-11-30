@@ -24,6 +24,7 @@ class Compress final : public userver::server::handlers::HttpHandlerBase {
       const userver::server::http::HttpRequest& request,
       userver::server::request::RequestContext&) const override {
 
+
     return "compressed file";
   }
 };
