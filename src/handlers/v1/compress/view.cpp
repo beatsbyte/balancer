@@ -12,11 +12,11 @@ namespace balancer {
 
 namespace {
 
-class Balancer final : public userver::server::handlers::HttpHandlerBase {
+class Compress final : public userver::server::handlers::HttpHandlerBase {
  public:
   static constexpr std::string_view kName = "handler-v1-compress";
 
-  Balancer(const userver::components::ComponentConfig& config,
+  Compress(const userver::components::ComponentConfig& config,
                const userver::components::ComponentContext& component_context)
       : HttpHandlerBase(config, component_context) {}
 
@@ -30,8 +30,8 @@ class Balancer final : public userver::server::handlers::HttpHandlerBase {
 
 }  // namespace
 
-void AppendBalancer(userver::components::ComponentList& component_list) {
-  component_list.Append<Balancer>();
+void AppendCompress(userver::components::ComponentList& component_list) {
+  component_list.Append<Compress>();
 }
 
 }  // namespace balancer

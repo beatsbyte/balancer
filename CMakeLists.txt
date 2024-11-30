@@ -28,6 +28,8 @@ userver_setup_environment()
 add_library(${PROJECT_NAME}_objs OBJECT
     src/handlers/v1/compress/view.hpp
     src/handlers/v1/compress/view.cpp
+    src/handlers/v1/imalive/view.hpp
+    src/handlers/v1/imalive/view.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::postgresql)
 

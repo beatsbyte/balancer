@@ -7,6 +7,6 @@
 
 namespace balancer {
 
-void AppendCompress(userver::components::ComponentList& component_list);
+void AppendImAlive(userver::components::ComponentList& component_list);
 
 }  // namespace balancer
