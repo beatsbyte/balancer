@@ -29,3 +29,17 @@ paths:
                   format: binary
               required:
                 - file
+  /v1/imalive:
+    put:
+      description: I am alive
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  description: Url of server
+                  type: string
+                  required: true

@@ -7,6 +7,7 @@
 #include <userver/utils/daemon_run.hpp>
 
 #include "handlers/v1/compress/view.hpp"
+#include "handlers/v1/imalive/view.hpp"
 
 int main(int argc, char* argv[]) {
   auto component_list = userver::components::MinimalServerComponentList()
@@ -16,7 +17,8 @@ int main(int argc, char* argv[]) {
                             .Append<userver::server::handlers::TestsControl>()
                             .Append<userver::clients::dns::Component>();
 
-  balancer::AppendBalancer(component_list);
-  //TODO implement logic to seperate requests
+  balancer::AppendCompress(component_list);
+  balancer::AppendImAlive(component_list);
+
   return userver::utils::DaemonMain(argc, argv, component_list);
 }
