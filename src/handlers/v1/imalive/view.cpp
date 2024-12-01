@@ -29,7 +29,7 @@ class ImAlive final : public userver::server::handlers::HttpHandlerBase {
         userver::formats::json::FromString(request.RequestBody());
 
     auto url = request_body["url"].As<std::optional<std::string>>();
-    if (!url.has_value()) {
+    if (!url.has_value() || url.value().empty()) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::server::http::HttpStatus::kBadRequest);
       return {};
