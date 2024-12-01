@@ -30,6 +30,10 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/handlers/v1/compress/view.cpp
     src/handlers/v1/imalive/view.hpp
     src/handlers/v1/imalive/view.cpp
+    src/models/worker/worker.hpp
+    src/models/worker/worker.cpp
+    src/models/worker_pool/worker_pool.hpp
+    src/models/worker_pool/worker_pool.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::postgresql)
 

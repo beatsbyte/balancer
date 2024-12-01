@@ -2,19 +2,24 @@
 
 #include <string>
 #include <atomic>
+#include <mutex>
+#include <userver/server/handlers/http_handler_base.hpp>
 
-namespace balancer {
+namespace worker {
     struct Worker
     {
         std::string url;
         size_t last_updated;
-        std::atomic<std::size_t> active_connections = 0;
+        int active_connections;
+        mutable std::mutex* mtx;
 
-        static time_to_die = 10;
+        static const size_t time_to_die = 10;
 
+        Worker();
         Worker(const std::string &url);
 
         bool IsAlive();
-        std::string MakeCall(const userver::server::http::HttpRequest&);
+        std::string MakeCall(const userver::server::http::HttpRequest& request,
+                             userver::components::HttpClient&);
     };
-}
+} // worker

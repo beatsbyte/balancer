@@ -35,7 +35,7 @@ components_manager:
         testsuite-support: {}
 
         http-client:
-            load-enabled: $is-testing
+            load-enabled: true
             fs-task-processor: fs-task-processor
 
         tests-control:
@@ -43,6 +43,7 @@ components_manager:
             path: /tests/{action}
             method: POST
             task_processor: main-task-processor
+
         handler-ping:
             path: /ping
             method: GET
@@ -54,11 +55,14 @@ components_manager:
             path: /v1/compress
             method: POST
             task_processor: main-task-processor
+            max_request_size: 20971520
 
         handler-v1-imalive:
             path: /v1/imalive
             method: PUT
             task_processor: main-task-processor
+
+        worker-pool:
 
         dns-client:
             fs-task-processor: fs-task-processor

@@ -10,21 +10,24 @@
 #include <iostream>
 #include <chrono>
 
+#include "../../../models/worker_pool/worker_pool.hpp"
+
 namespace balancer {
 
 namespace {
 
 class ImAlive final : public userver::server::handlers::HttpHandlerBase {
+  worker_pool::WorkerPool* worker_pool_;
  public:
   static constexpr std::string_view kName = "handler-v1-imalive";
 
   ImAlive(const userver::components::ComponentConfig& config,
                const userver::components::ComponentContext& component_context)
-      : HttpHandlerBase(config, component_context) {}
+      : HttpHandlerBase(config, component_context), worker_pool_(&component_context.FindComponent<worker_pool::WorkerPool>("worker-pool")) {}
 
   std::string HandleRequestThrow(
       const userver::server::http::HttpRequest& request,
-      userver::server::request::RequestContext&) const override {  
+      userver::server::request::RequestContext&) const override {
     auto request_body = 
         userver::formats::json::FromString(request.RequestBody());
 
@@ -34,14 +37,16 @@ class ImAlive final : public userver::server::handlers::HttpHandlerBase {
       response.SetStatus(userver::server::http::HttpStatus::kBadRequest);
       return {};
     }
-    auto start = std::chrono::system_clock::now();
-    
-    //TODO logic to put servers map
-    
-    userver::formats::json::ValueBuilder response;
-    response["time"] = start;
 
-    return userver::formats::json::ToString(response.ExtractValue());
+    worker_pool_->Add(url.value());
+
+    std::string str;
+
+    for (auto x : worker_pool_->workers) {
+      str += x.first + " " + std::to_string(x.second.last_updated) + '\n';
+    }
+
+    return str;
   }
 };
 
