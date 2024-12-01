@@ -8,6 +8,8 @@
 
 #include "handlers/v1/compress/view.hpp"
 #include "handlers/v1/imalive/view.hpp"
+#include "models/worker_pool/worker_pool.hpp"
+
 
 int main(int argc, char* argv[]) {
   auto component_list = userver::components::MinimalServerComponentList()
@@ -17,8 +19,9 @@ int main(int argc, char* argv[]) {
                             .Append<userver::server::handlers::TestsControl>()
                             .Append<userver::clients::dns::Component>();
 
-  balancer::AppendCompress(component_list);
+  compress::AppendCompress(component_list);
   balancer::AppendImAlive(component_list);
+  worker_pool::AppendWorkerPool(component_list);
 
   return userver::utils::DaemonMain(argc, argv, component_list);
 }

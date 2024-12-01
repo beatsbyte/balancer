@@ -5,7 +5,7 @@
 
 #include <userver/components/component_list.hpp>
 
-namespace balancer {
+namespace compress {
 
 void AppendCompress(userver::components::ComponentList& component_list);
 
