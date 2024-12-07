@@ -8,6 +8,7 @@
 #include <userver/server/handlers/http_handler_base.hpp>
 #include <userver/utils/assert.hpp>
 #include <iostream>
+#include <sstream>
 #include <chrono>
 
 #include "../../../models/worker_pool/worker_pool.hpp"
@@ -32,14 +33,18 @@ class ImAlive final : public userver::server::handlers::HttpHandlerBase {
     auto request_body = 
         userver::formats::json::FromString(request.RequestBody());
 
-    auto url = request_body["url"].As<std::optional<std::string>>();
-    if (!url.has_value() || url.value().empty()) {
+    auto path = request_body["url"].As<std::optional<std::string>>();
+
+    if (!path.has_value() || path.value().empty()) {
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::server::http::HttpStatus::kBadRequest);
       return {};
     }
 
-    bool could_add = worker_pool_->Add(url.value());
+    std::stringstream url;
+    url << path.value();
+
+    bool could_add = worker_pool_->Add(url.str());
 
     if (!could_add) {
       auto& response = request.GetHttpResponse();
@@ -47,7 +52,7 @@ class ImAlive final : public userver::server::handlers::HttpHandlerBase {
       return {};
     }
 
-    return {};
+    return {url.str()};
   }
 };
 
