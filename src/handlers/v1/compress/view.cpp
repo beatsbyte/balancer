@@ -1,6 +1,7 @@
 #include "view.hpp"
 
 #include <fmt/format.h>
+#include <optional>
 
 #include <userver/components/component_list.hpp>
 #include <userver/components/component_config.hpp>
@@ -23,20 +24,20 @@ class Compress final : public userver::server::handlers::HttpHandlerBase {
 
   Compress(const userver::components::ComponentConfig& config,
                const userver::components::ComponentContext& component_context)
-      : HttpHandlerBase(config, component_context), worker_pool_(&component_context.FindComponent<worker_pool::WorkerPool>("worker-pool")) {}
+      : HttpHandlerBase(config, component_context),
+        worker_pool_(&component_context.FindComponent<worker_pool::WorkerPool>("worker-pool")) {}
 
   std::string HandleRequestThrow(
       const userver::server::http::HttpRequest& request,
-      userver::server::request::RequestContext& context) const override {
+      userver::server::request::RequestContext&) const override {
 
-    try {
-      std::string response = worker_pool_->MakeCall(request);
-      return response;
-    } catch (...) {
+      auto call_response = worker_pool_->MakeCall(request);
+      if (call_response.has_value())
+        return call_response.value();
+
       auto& response = request.GetHttpResponse();
       response.SetStatus(userver::server::http::HttpStatus::kServiceUnavailable);
       return {};
-    }
   }
 };
 

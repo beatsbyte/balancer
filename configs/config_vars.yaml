@@ -5,3 +5,6 @@ logger-level: info
 is-testing: false
 
 server-port: 8080
+
+worker_time_to_die: 10
+worker_request_timeout: 40

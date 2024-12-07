@@ -7,18 +7,14 @@
 namespace worker {
 
     Worker::Worker() {
-      auto current_time = std::time_t(nullptr);
-      last_updated = static_cast<size_t>(current_time);
-      active_connections = 0;
+      auto now = std::chrono::system_clock::now();
+      auto now_seconds = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+      last_updated = now_seconds;
+      active_connections = new std::atomic<int>(0);
     };
 
     Worker::Worker(const std::string &_url)
-    : url(_url) {
-        auto now = std::chrono::system_clock::now();
-        auto now_seconds = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
-        last_updated = now_seconds;
-        active_connections = 0;
-    };
+    : Worker() {url = _url;};
 
     bool Worker::IsAlive() {
       auto now = std::chrono::system_clock::now();
@@ -27,24 +23,17 @@ namespace worker {
       return now_seconds - last_updated < time_to_die;
     }
 
-    std::string Worker::MakeCall(const userver::server::http::HttpRequest& request,
+    std::optional<std::string> Worker::MakeCall(const userver::server::http::HttpRequest& request,
                                  userver::components::HttpClient& http_client) {
-
-      {
-        std::lock_guard<std::mutex> lock(*mtx);
-        ++active_connections;
-      }
-      auto &client = http_client.GetHttpClient();
-      auto new_request = client.CreateRequest().post(url, request.RequestBody()).timeout(std::chrono::seconds(40));
-      new_request.headers(request.GetHeaders());
-
       try {
+        ++*active_connections;
+        auto &client = http_client.GetHttpClient();
+        auto new_request = client.CreateRequest().post(url, request.RequestBody()).timeout(std::chrono::seconds(40));
+        new_request.headers(request.GetHeaders());
+
         auto res = new_request.perform();
+        --*active_connections;
         if (res->IsOk()) {
-          {
-            std::lock_guard<std::mutex> lock(*mtx);
-            --active_connections;
-          }
           auto& response = request.GetHttpResponse();
 
           response.SetContentType("audio/mpeg");
@@ -56,10 +45,7 @@ namespace worker {
         return {};
 
       } catch (...) {
-        {
-          std::lock_guard<std::mutex> lock(*mtx);
-          --active_connections;
-        }
+        --*active_connections;
         auto& response = request.GetHttpResponse();
         response.SetStatus(userver::server::http::HttpStatus::kServiceUnavailable);
         return {};

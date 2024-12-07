@@ -23,7 +23,8 @@ class ImAlive final : public userver::server::handlers::HttpHandlerBase {
 
   ImAlive(const userver::components::ComponentConfig& config,
                const userver::components::ComponentContext& component_context)
-      : HttpHandlerBase(config, component_context), worker_pool_(&component_context.FindComponent<worker_pool::WorkerPool>("worker-pool")) {}
+      : HttpHandlerBase(config, component_context),
+        worker_pool_(&component_context.FindComponent<worker_pool::WorkerPool>("worker-pool")) {}
 
   std::string HandleRequestThrow(
       const userver::server::http::HttpRequest& request,
@@ -38,15 +39,15 @@ class ImAlive final : public userver::server::handlers::HttpHandlerBase {
       return {};
     }
 
-    worker_pool_->Add(url.value());
+    bool could_add = worker_pool_->Add(url.value());
 
-    std::string str;
-
-    for (auto x : worker_pool_->workers) {
-      str += x.first + " " + std::to_string(x.second.last_updated) + '\n';
+    if (!could_add) {
+      auto& response = request.GetHttpResponse();
+      response.SetStatus(userver::server::http::HttpStatus::kBadRequest);
+      return {};
     }
 
-    return str;
+    return {};
   }
 };
 
