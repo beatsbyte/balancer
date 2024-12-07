@@ -2,24 +2,33 @@
 
 #include <string>
 #include <atomic>
-#include <mutex>
+#include <optional>
 #include <userver/server/handlers/http_handler_base.hpp>
 
 namespace worker {
     struct Worker
     {
+     private:
         std::string url;
         size_t last_updated;
-        int active_connections;
-        mutable std::mutex* mtx;
+        std::atomic<int> *active_connections;
 
         static const size_t time_to_die = 10;
-
+     public:
         Worker();
         Worker(const std::string &url);
 
+        void SetLastUpdated(size_t time) {
+          last_updated = time;
+        }
+        int GetLastUpdated() const {
+          return last_updated;
+        }
+        int GetActiveConnections() const {
+          return *active_connections;
+        }
         bool IsAlive();
-        std::string MakeCall(const userver::server::http::HttpRequest& request,
+        std::optional<std::string> MakeCall(const userver::server::http::HttpRequest& request,
                              userver::components::HttpClient&);
     };
 } // worker
