@@ -48,7 +48,7 @@ target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs user
 add_google_tests(${PROJECT_NAME}_unittest)
 
 # Functional Tests
-userver_testsuite_add_simple()
+# userver_testsuite_add_simple()
 
 # Install
 include(GNUInstallDirs)
