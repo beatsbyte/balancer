@@ -13,7 +13,7 @@ namespace worker {
         size_t last_updated;
         std::atomic<int> *active_connections;
 
-        static const size_t time_to_die = 20;
+        static const size_t time_to_die = 10;
      public:
         Worker();
         Worker(const std::string &url);
