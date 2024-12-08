@@ -46,6 +46,9 @@ std::optional<std::string> WorkerPool::MakeCall(
   auto next_url = GetNext();
   if (!next_url.has_value()) return std::nullopt;
 
+  std::string worker_header_name = "X-Proxy-Worker-Url";
+  request.GetHttpResponse().SetHeader(worker_header_name, next_url.value());
+
   return workers[next_url.value()].MakeCall(request, client_);
 }
 
